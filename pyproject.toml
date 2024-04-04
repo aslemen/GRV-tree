@@ -9,8 +9,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 nltk = "^3.8.1"
-nltk-tree-extensions = {git = "https://github.com/aslemen/nltk-tree-ext"}
 more-itertools = "^10.2.0"
+nltk-tree-extensions = "^3.7.0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
