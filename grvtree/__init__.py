@@ -54,7 +54,7 @@ class GRVCellCompareScore:
         )
 
     def precision_height_diff(self, relative: bool = True) -> float:
-        len_this, len_other = self.lengths(cut_end = True, relative = relative)
+        len_this, len_other = self.lengths(cut_end=True, relative=relative)
         if len_this < 1 and len_other < 1:
             return 1
         else:
@@ -75,10 +75,10 @@ class GRVCellCompareScore:
     def precision_form(self) -> float:
         return self.matched_form / max(self.lengths())
 
-    def to_dict(self) -> dict[str, int | float]:
+    def to_dict(self, relative: bool = True) -> dict[str, int | float]:
         return {
             **dataclasses.asdict(self),
-            "precision_height_diff": self.precision_height_diff(),
+            "precision_height_diff": self.precision_height_diff(relative=relative),
             "precision_phrase_cat": self.precision_phrase_cat(),
             "precision_lex_cat": self.precision_lex_cat(),
             "precision_form": self.precision_form(),
@@ -344,10 +344,10 @@ class GRVCell(Generic[P, L, F]):
         else:
             # (initial_height - 1) branches will be grown from now on.
             # The strategy is that we first grow (initial_height - 2) empty branches by loop, ...
-            new_node: Tree = Tree(None, []) # type: ignore
+            new_node: Tree = Tree(None, [])  # type: ignore
             tree_pointer = [new_node]
             for _ in range(initial_height - 2):
-                child: Tree[NODE, LEAF] = Tree(None, []) # type: ignore
+                child: Tree[NODE, LEAF] = Tree(None, [])  # type: ignore
                 # insert `child` to the last pointed tree
                 tree_pointer[-1].append(child)
                 # add `child` to the pointer stack
@@ -366,7 +366,7 @@ class GRVCell(Generic[P, L, F]):
                 # Grow (height_diff) branches from the current pointer
                 # Firstly, grow (height_diff - 1) empty branches
                 for _ in range(cell.height_diff - 1):
-                    child: Tree[NODE, LEAF] = Tree(None, []) # type: ignore
+                    child: Tree[NODE, LEAF] = Tree(None, [])  # type: ignore
                     tree_pointer[-1].append(child)  # type: ignore
                     tree_pointer.append(child)
 
