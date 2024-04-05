@@ -46,7 +46,7 @@ class GRVCellCompareScore:
     matched_form: int
 
     def lengths(
-        self, cut_end: bool = False, relative: bool = True
+        self, cut_end: bool = True, relative: bool = True
     ):  # -> tuple[Any, Any]:# -> tuple[Any, Any]:
         return (
             self.length_this - (1 if cut_end else 0) - (1 if relative else 0),
@@ -64,16 +64,16 @@ class GRVCellCompareScore:
             ) / max(len_this, len_other)
 
     def precision_phrase_cat(self) -> float:
-        if (max_len := max(self.lengths())) <= 1:
+        if (max_len := max(self.lengths(cut_end=True, relative=False))) <= 1:
             return 1
         else:
             return self.matched_phrase_cat / (max_len - 1)
 
     def precision_lex_cat(self) -> float:
-        return self.matched_lex_cat / max(self.lengths())
+        return self.matched_lex_cat / max(self.lengths(cut_end=False, relative=False))
 
     def precision_form(self) -> float:
-        return self.matched_form / max(self.lengths())
+        return self.matched_form / max(self.lengths(cut_end=False, relative=False))
 
     def to_dict(self, relative: bool = True) -> dict[str, int | float]:
         return {
