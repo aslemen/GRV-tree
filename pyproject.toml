@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "grvtree"
-version = "0.1.1"
+version = "0.1.2"
 description = "An implementation of Gómez-Rodríguez and Vilares' tree linearization"
 homepage = "https://pypi.org/project/grvtree/"
 repository = "https://github.com/aslemen/GRV-tree"
