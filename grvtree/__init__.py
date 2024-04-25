@@ -45,15 +45,34 @@ class GRVCellCompareScore:
     matched_lex_cat: int
     matched_form: int
 
-    def lengths(
-        self, cut_end: bool = True, relative: bool = True
-    ):  # -> tuple[Any, Any]:# -> tuple[Any, Any]:
+    def lengths(self, cut_end: bool = True, relative: bool = True) -> tuple[int, int]:
+        """
+        Calculate the lengths of the sequences to be compared.
+
+        Arguments
+        ---------
+        cut_end
+            If `True`, the last cells are not counted.
+        relative
+            If `True`, the first cells are not counted.
+
+        Returns
+        -------
+        length_this : int
+        length_other : int
+        """
         return (
             self.length_this - (1 if cut_end else 0) - (1 if relative else 0),
             self.length_other - (1 if cut_end else 0) - (1 if relative else 0),
         )
 
     def precision_height_diff(self, relative: bool = True) -> float:
+        """
+        Arguments
+        ---------
+        relative
+            If `True`, the absolute height difference is ignored.
+        """
         len_this, len_other = self.lengths(cut_end=True, relative=relative)
         if len_this < 1 and len_other < 1:
             return 1
@@ -76,6 +95,12 @@ class GRVCellCompareScore:
         return self.matched_form / max(self.lengths(cut_end=False, relative=False))
 
     def to_dict(self, relative: bool = True) -> dict[str, int | float]:
+        """
+        Arguments
+        ---------
+        relative
+            If `True`, the absolute height difference is ignored.
+        """
         return {
             **dataclasses.asdict(self),
             "precision_height_diff": self.precision_height_diff(relative=relative),
