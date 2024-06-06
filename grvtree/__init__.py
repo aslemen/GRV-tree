@@ -323,6 +323,7 @@ class GRVCell(Generic[P, L, F]):
     def decode_as_nltk_tree(
         cls: Type["GRVCell[NODE, NODE, LEAF]"],
         cells: Sequence["GRVCell[NODE, NODE, LEAF]"],
+        default_label: NODE,
         relativize_init_height: bool = True,
     ) -> Tree[NODE, LEAF]:
         """
@@ -369,10 +370,10 @@ class GRVCell(Generic[P, L, F]):
         else:
             # (initial_height - 1) branches will be grown from now on.
             # The strategy is that we first grow (initial_height - 2) empty branches by loop, ...
-            new_node: Tree = Tree(None, [])  # type: ignore
+            new_node: Tree[NODE, LEAF] = Tree(default_label, [])
             tree_pointer = [new_node]
             for _ in range(initial_height - 2):
-                child: Tree[NODE, LEAF] = Tree(None, [])  # type: ignore
+                child: Tree[NODE, LEAF] = Tree(default_label, [])
                 # insert `child` to the last pointed tree
                 tree_pointer[-1].append(child)
                 # add `child` to the pointer stack
@@ -383,7 +384,7 @@ class GRVCell(Generic[P, L, F]):
                 (initial_cell.phrase_cat, initial_cell.lex_cat),
                 (initial_cell.form,),
             )
-            tree_pointer[-1].append(terminal_subtree)  # type: ignore
+            tree_pointer[-1].append(terminal_subtree)
             tree_pointer.append(terminal_subtree)
 
         for cell in cells[1:]:
@@ -391,8 +392,8 @@ class GRVCell(Generic[P, L, F]):
                 # Grow (height_diff) branches from the current pointer
                 # Firstly, grow (height_diff - 1) empty branches
                 for _ in range(cell.height_diff - 1):
-                    child: Tree[NODE, LEAF] = Tree(None, [])  # type: ignore
-                    tree_pointer[-1].append(child)  # type: ignore
+                    child: Tree[NODE, LEAF] = Tree(default_label, [])
+                    tree_pointer[-1].append(child)
                     tree_pointer.append(child)
 
                 # Then create a subtree according to the cell.
@@ -400,21 +401,21 @@ class GRVCell(Generic[P, L, F]):
                     (cell.phrase_cat, cell.lex_cat), (cell.form,)
                 )
                 # Lastly, adjoin it to the current position
-                tree_pointer[-1].append(terminal_subtree)  # type: ignore
+                tree_pointer[-1].append(terminal_subtree)
                 tree_pointer.append(terminal_subtree)
             elif cell.height_diff == 0:
                 # adjoint form to the pointer
                 # (the relevant node on the last branch)
-                tree_pointer[-1].append(  # type: ignore
+                tree_pointer[-1].append(
                     Tree.fromlist_as_unary((cell.lex_cat,), (cell.form,))
                 )
                 # no need to move the pointer
             else:
                 # adjoint form to the pointer
                 # (the relevant node on the last branch)
-                tree_pointer[-1].append(  # type: ignore
+                tree_pointer[-1].append(
                     Tree.fromlist_as_unary((cell.lex_cat,), (cell.form,))
-                )  # type: ignore
+                )
 
                 # move back the pointer
                 tree_pointer = tree_pointer[: cell.height_diff]
