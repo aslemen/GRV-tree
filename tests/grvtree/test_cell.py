@@ -131,7 +131,7 @@ class TestGRVCell:
 
     @pytest.mark.parametrize("tree_raw, cells", RAW_TREES_WITH_GDV)
     def test_decode_GRV(self, tree_raw: str, cells):
-        tree_decoded = GRVCell.decode_as_nltk_tree(cells)
+        tree_decoded = GRVCell.decode_as_nltk_tree(cells, default_label="UNKNOWN")
         tree_raw_parsed = Tree.fromstring(tree_raw).merge_nonterminal_unary_nodes(
             lambda a, b: f"{a}☆{b}"
         )
