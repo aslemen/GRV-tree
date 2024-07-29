@@ -69,14 +69,14 @@ class GRVCellCompareScore:
     The count of matched lexical forms.
     """
 
-    def precision_height_diff_relative(self) -> float:
+    def accuracy_height_diff_relative(self) -> float:
         len_this, len_other = self.lengths_for_height_diff()
         if len_this < 1 and len_other < 1:
             return 1
         else:
             return self.matched_height_diff / max(len_this, len_other)
 
-    def precision_height_diff_absolute(self) -> float:
+    def accuracy_height_diff_absolute(self) -> float:
         len_this, len_other = self.lengths_for_height_diff()
         len_this += 1
         len_other += 1
@@ -87,7 +87,7 @@ class GRVCellCompareScore:
                 len_this, len_other
             )
 
-    def precision_phrase_cat(self) -> float:
+    def accuracy_phrase_cat(self) -> float:
         len_this, len_other = self.lengths_for_phrase_cat()
 
         if len_this < 1 and len_other < 1:
@@ -95,13 +95,13 @@ class GRVCellCompareScore:
         else:
             return self.matched_phrase_cat / max(len_this, len_other)
 
-    def precision_lex_cat(self) -> float:
+    def accuracy_lex_cat(self) -> float:
         if self.length_this < 1 and self.length_other < 1:
             return 1
         else:
             return self.matched_lex_cat / max(self.length_this, self.length_other)
 
-    def precision_form(self) -> float:
+    def accuracy_form(self) -> float:
         if self.length_this < 1 and self.length_other < 1:
             return 1
         else:
@@ -110,11 +110,11 @@ class GRVCellCompareScore:
     def to_dict(self) -> dict[str, int | float]:
         return {
             **dataclasses.asdict(self),
-            "precision_height_diff_relative": self.precision_height_diff_relative(),
-            "precision_height_diff_absolute": self.precision_height_diff_absolute(),
-            "precision_phrase_cat": self.precision_phrase_cat(),
-            "precision_lex_cat": self.precision_lex_cat(),
-            "precision_form": self.precision_form(),
+            "accuracy_height_diff_relative": self.accuracy_height_diff_relative(),
+            "accuracy_height_diff_absolute": self.accuracy_height_diff_absolute(),
+            "accuracy_phrase_cat": self.accuracy_phrase_cat(),
+            "accuracy_lex_cat": self.accuracy_lex_cat(),
+            "accuracy_form": self.accuracy_form(),
         }
 
 

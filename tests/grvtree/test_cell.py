@@ -301,9 +301,9 @@ class TestGRVCellCompareScore:
     )
 
     @pytest.mark.parametrize("score, prec_rel, prec_abs", SCORE_HEIGHT_DIFF)
-    def test_precision_height_diff(self, score, prec_rel, prec_abs):
-        assert score.precision_height_diff_relative() == prec_rel
-        assert score.precision_height_diff_absolute() == prec_abs
+    def test_accuracy_height_diff(self, score, prec_rel, prec_abs):
+        assert score.accuracy_height_diff_relative() == prec_rel
+        assert score.accuracy_height_diff_absolute() == prec_abs
 
     SCORE_PHRASE_CAT = (
         (
