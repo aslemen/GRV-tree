@@ -17,7 +17,18 @@ LEAF = TypeVar("LEAF")
 @dataclass(frozen=True, slots=True)
 class GRVCellCompareScore:
     length_this: int
+    """
+    The length of the first sequence.
+    """
+
     length_other: int
+    """
+    The length of the second sequence.
+    """
+
+    def lengths(self) -> tuple[int, int]:
+        return self.length_this, self.length_other
+
     first_height_diff_match: bool
     """
     Whether the first height differences match.
@@ -29,9 +40,12 @@ class GRVCellCompareScore:
 
     Notes
     -----
-    The first cells are not counted.
-    The last cells are not counted, either.
+    Either the first or the last cells are not counted.
+    For the match of the first cells, check `first_height_diff_match`.
     """
+
+    def lengths_for_height_diff(self) -> tuple[int, int]:
+        return self.length_this - 2, self.length_other - 2
 
     matched_phrase_cat: int
     """
@@ -39,71 +53,65 @@ class GRVCellCompareScore:
 
     Notes
     -----
-    The last cells are not counted, either.
+    The last cells are not counted.
     """
 
+    def lengths_for_phrase_cat(self) -> tuple[int, int]:
+        return self.length_this - 1, self.length_other - 1
+
     matched_lex_cat: int
+    """
+    The count of matched lexical categories.
+    """
+
     matched_form: int
+    """
+    The count of matched lexical forms.
+    """
 
-    def lengths(self, cut_end: bool = True, relative: bool = True) -> tuple[int, int]:
-        """
-        Calculate the lengths of the sequences to be compared.
-
-        Arguments
-        ---------
-        cut_end
-            If `True`, the last cells are not counted.
-        relative
-            If `True`, the first cells are not counted.
-
-        Returns
-        -------
-        length_this : int
-        length_other : int
-        """
-        return (
-            self.length_this - (1 if cut_end else 0) - (1 if relative else 0),
-            self.length_other - (1 if cut_end else 0) - (1 if relative else 0),
-        )
-
-    def precision_height_diff(self, relative: bool = True) -> float:
-        """
-        Arguments
-        ---------
-        relative
-            If `True`, the absolute height difference is ignored.
-        """
-        len_this, len_other = self.lengths(cut_end=True, relative=relative)
+    def precision_height_diff_relative(self) -> float:
+        len_this, len_other = self.lengths_for_height_diff()
         if len_this < 1 and len_other < 1:
             return 1
         else:
-            return (
-                self.matched_height_diff
-                + (1 if not relative and self.first_height_diff_match else 0)
-            ) / max(len_this, len_other)
+            return self.matched_height_diff / max(len_this, len_other)
 
-    def precision_phrase_cat(self) -> float:
-        if (max_len := max(self.lengths(cut_end=True, relative=False))) <= 1:
+    def precision_height_diff_absolute(self) -> float:
+        len_this, len_other = self.lengths_for_height_diff()
+        len_this += 1
+        len_other += 1
+        if len_this < 1 and len_other < 1:
             return 1
         else:
-            return self.matched_phrase_cat / (max_len - 1)
+            return (self.matched_height_diff + int(self.first_height_diff_match)) / max(
+                len_this, len_other
+            )
+
+    def precision_phrase_cat(self) -> float:
+        len_this, len_other = self.lengths_for_phrase_cat()
+
+        if len_this < 1 and len_other < 1:
+            return 1
+        else:
+            return self.matched_phrase_cat / max(len_this, len_other)
 
     def precision_lex_cat(self) -> float:
-        return self.matched_lex_cat / max(self.lengths(cut_end=False, relative=False))
+        if self.length_this < 1 and self.length_other < 1:
+            return 1
+        else:
+            return self.matched_lex_cat / max(self.length_this, self.length_other)
 
     def precision_form(self) -> float:
-        return self.matched_form / max(self.lengths(cut_end=False, relative=False))
+        if self.length_this < 1 and self.length_other < 1:
+            return 1
+        else:
+            return self.matched_form / max(self.length_this, self.length_other)
 
-    def to_dict(self, relative: bool = True) -> dict[str, int | float]:
-        """
-        Arguments
-        ---------
-        relative
-            If `True`, the absolute height difference is ignored.
-        """
+    def to_dict(self) -> dict[str, int | float]:
         return {
             **dataclasses.asdict(self),
-            "precision_height_diff": self.precision_height_diff(relative=relative),
+            "precision_height_diff_relative": self.precision_height_diff_relative(),
+            "precision_height_diff_absolute": self.precision_height_diff_absolute(),
             "precision_phrase_cat": self.precision_phrase_cat(),
             "precision_lex_cat": self.precision_lex_cat(),
             "precision_form": self.precision_form(),
